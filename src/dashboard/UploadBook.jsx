@@ -1,128 +1,278 @@
-import React, { useState } from 'react'
-import { Button, Checkbox, Label, Select, TextInput, Textarea } from "flowbite-react";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaCloudUploadAlt, FaSpinner, FaCheckCircle } from 'react-icons/fa';
+
 const UploadBook = () => {
+  const [formData, setFormData] = useState({
+    title: '',
+    author: '',
+    category: '',
+    description: '',
+    price: '',
+    imageURL: '',
+    bookPdfURL: '',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
   const bookCategories = [
-    "Civil",
-    "Machanical",
-    "Computer Science",
-    "Electrical",
-    "Food Technology",
-    "Aronotical",
-    "CSE IOT",
-    "AIDS"
-  ]
+    'Fiction',
+    'Non-Fiction',
+    'Programming',
+    'Science & Tech',
+    'History',
+    'Business',
+    'Self-Help',
+    'Academic',
+    'Other'
+  ];
 
-  const [selectedBookCategory, setSelectedBookCategory] = useState(bookCategories[0]);
-
-  const handleChangeSelectedValue = (event) => {
-    // console.log(event.target.value);
-    setSelectedBookCategory(event.target.value);
-  }
-
-  //handle book submission
-  const handleBookSubmit = (event) => {
-    event.preventDefault();
-    const form = event.target;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    const bookTitle = form.bookTitle.value;
-    const authorName = form.authorName.value;
-    const imgUrl = form.imgUrl.value;
-    const category = form.categoryName.value;
-    const bookDescription = form.bookDescription.value;
-    const bookPdfUrl = form.bookPdfUrl.value;
-
-    const bookObj = {
-      bookTitle,authorName,imgUrl,category,bookDescription,bookPdfUrl
-    }
-
-    console.log(bookObj);
-
-    //send data to DB
-
-    fetch("http://localhost:5000/upload-book", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: JSON.stringify(bookObj)
-    })
-      .then(res => res.json())
-      .then(data => {
-        // console.log(data);
-        alert("Books are loaded successfully!");
-        form.reset();
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch('YOUR_API_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
-    
-  }
+
+      if (!response.ok) {
+        throw new Error('Failed to upload book');
+      }
+
+      setSuccess(true);
+      setFormData({
+        title: '',
+        author: '',
+        category: '',
+        description: '',
+        price: '',
+        imageURL: '',
+        bookPdfURL: '',
+      });
+
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   return (
-    <div className='px-4 my-12'>
-      <h2 className='mb-8 text-3xl font-bold'>Upload A Book</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-[#FDF8F7] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white rounded-2xl shadow-xl p-8"
+        >
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <FaCloudUploadAlt className="w-8 h-8 text-blue-500" />
+            </motion.div>
+            <h2 className="text-3xl font-bold text-gray-900">Upload New Book</h2>
+            <p className="mt-2 text-gray-600">Fill in the details below to add a new book to the library</p>
+          </div>
 
-      <form onSubmit={handleBookSubmit} className="flex lg:w-[1180px] flex-col flex-wrap gap-4">
-        {/* 1st book */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
+            >
+              {error}
+            </motion.div>
+          )}
 
-        <div className='flex gap-8'>
-          <div className='lg:w-1/2'>
-            <div className="mb-2 block">
-              <Label htmlFor="bookTitle" value="Book Title" />
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-600 text-sm flex items-center gap-2"
+            >
+              <FaCheckCircle className="w-5 h-5" />
+              Book uploaded successfully!
+            </motion.div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                  Book Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm"
+                  placeholder="Enter book title"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
+                  Author
+                </label>
+                <input
+                  type="text"
+                  id="author"
+                  name="author"
+                  value={formData.author}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm"
+                  placeholder="Enter author name"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm bg-white"
+                >
+                  <option value="">Select a category</option>
+                  {bookCategories.map((category) => (
+                    <option key={category} value={category.toLowerCase()}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+                  Price
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  step="0.01"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm"
+                  placeholder="Enter price"
+                />
+              </div>
             </div>
-            <TextInput id="bookTitle" name='bookTitle' type="text" placeholder="Book Name" required />
-          </div>
-
-          <div className='lg:w-1/2'>
-            <div className="mb-2 block">
-              <Label htmlFor="authorName" value="Author Name" />
-            </div>
-            <TextInput id="authorName" name='authorName' type="text" placeholder="Author Name" required />
-          </div>
-        </div>
-
-        {/* 2nd */}
-        <div className='flex gap-8'>
-          <div className='lg:w-1/2'>
-            <div className="mb-2 block">
-              <Label htmlFor="imgUrl" value="Book Image URL" />
-            </div>
-            <TextInput id="imgUrl" name='imgUrl' type="text" placeholder="Book Image URL" required />
-          </div>
-
-          {/* category */}
-          <div className='lg:w-1/2'>
-            <div className="mb-2 block">
-              <Label htmlFor="inputSate" value="Book Category" />
-            </div>
-
-            <Select id="inputSate" name="categoryName" className='w-full rounded' value={selectedBookCategory} onChange={handleChangeSelectedValue}>
-              {
-                bookCategories.map((Option) => <option key={Option} value={Option}>{Option}</option>)
-              }
-            </Select>
-          </div>
-        </div>
-
-        {/* bookDescription */}
-        <div>
-          <div className="mb-2 block">
-            <Label htmlFor="bookDescription" value="Book Description" />
-          </div>
-          <Textarea id="bookDescription" name='bookDescription' placeholder="Write Your Book Description" required rows={6} className='w-full ' />
-        </div>
-
-            {/*pdf link*/}
 
             <div>
-        <div className="mb-2 block">
-          <Label htmlFor="bookPdfUrl" value="Book Pdf Url" />
-        </div>
-        <TextInput id="bookPdfUrl" name='bookPdfUrl' type="text" placeholder="Book Pdf Url" required />
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                rows="4"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm resize-none"
+                placeholder="Enter book description"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label htmlFor="imageURL" className="block text-sm font-medium text-gray-700 mb-2">
+                  Book Cover URL
+                </label>
+                <input
+                  type="url"
+                  id="imageURL"
+                  name="imageURL"
+                  value={formData.imageURL}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm"
+                  placeholder="Enter image URL"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="bookPdfURL" className="block text-sm font-medium text-gray-700 mb-2">
+                  PDF URL
+                </label>
+                <input
+                  type="url"
+                  id="bookPdfURL"
+                  name="bookPdfURL"
+                  value={formData.bookPdfURL}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow hover:shadow-sm"
+                  placeholder="Enter PDF URL"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-4 px-6 rounded-xl text-white font-medium text-lg transition-all
+                  ${loading
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-600 active:scale-[0.98] hover:shadow-lg shadow-blue-500/25'
+                  }
+                `}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <FaSpinner className="w-5 h-5 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <FaCloudUploadAlt className="w-5 h-5" />
+                      Upload Book
+                    </>
+                  )}
+                </span>
+              </button>
+            </div>
+          </form>
+        </motion.div>
       </div>
-
-      <Button type="submit" className='mt-5'>Upload Book</Button>
-      
-      </form>
     </div>
-  )
-}
+  );
+};
 
-export default UploadBook
+export default UploadBook;

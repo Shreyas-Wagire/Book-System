@@ -23,6 +23,7 @@ const FavBook = () => {
                 <h3 className='text-3xl font-bold '>400+</h3>
                 <p className='text-base'>Register users</p>
               </div>
+
               <div>
                 <h3 className='text-3xl font-bold '>1200+</h3>
                 <p className='text-base'>PDF Downloaded</p>

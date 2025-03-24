@@ -1,21 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 import { Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import MyFooter from './components/MyFooter'
+import './App.css'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-    <Navbar/>
-    <div className='min-h-screen '>
-      <Outlet/>
-    </div>
-     <MyFooter/>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+          success: {
+            style: {
+              background: '#22c55e',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+            },
+          },
+        }}
+      />
+      <Navbar />
+      <div className='min-h-screen'>
+        <Outlet />
+      </div>
+      <MyFooter />
     </>
   )
 }

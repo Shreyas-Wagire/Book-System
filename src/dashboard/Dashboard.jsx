@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserInfoCard from '../components/UserInfoCard';
+import { AuthContext } from '../contects/AuthProvider';
 
 const Dashboard = () => {
   // Example state variables
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
   // Simulate fetching user data
   useEffect(() => {
@@ -31,16 +34,7 @@ const Dashboard = () => {
   const UserWidget = () => (
     <div className='bg-white shadow-md p-4 rounded-lg border'>
       <h3 className='text-xl font-semibold mb-4'>User Information</h3>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <p><strong>Name:</strong> {userData?.name}</p>
-          <p><strong>Email:</strong> {userData?.email}</p>
-          <p><strong>Phone:</strong> {userData?.phone}</p>
-          <p><strong>Website:</strong> {userData?.website}</p>
-        </div>
-      )}
+      <UserInfoCard />
     </div>
   );
 
