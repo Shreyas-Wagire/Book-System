@@ -1,3 +1,39 @@
 header, nav{
     z-index: 100001 !important;
 }
+
+/* Safe area insets for mobile devices */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .min-h-screen {
+        padding-bottom: 4rem; /* Add space for bottom navigation */
+    }
+    
+    /* Adjust content padding for mobile */
+    .py-24 {
+        padding-top: 5rem;
+        padding-bottom: 3rem;
+    }
+    
+    /* Make images responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* Fix for iOS Safari bottom bar */
+@supports (-webkit-touch-callout: none) {
+    .fixed.bottom-0 {
+        padding-bottom: env(safe-area-inset-bottom);
+        height: calc(4rem + env(safe-area-inset-bottom));
+    }
+    
+    .h-16 {
+        height: calc(4rem + env(safe-area-inset-bottom));
+    }
+}

@@ -1,88 +1,161 @@
 import React, { useContext, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../contects/AuthProvider'
-import googleLogo from "../assets/google-logo.svg"
+import { motion } from 'framer-motion'
+import { FaGoogle, FaEnvelope, FaLock, FaUser } from 'react-icons/fa'
 
 const Signup = () => {
     const { createUser, loginWithGoogle } = useContext(AuthContext);
-    const [error, setError] = useState("error");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Move these hooks to the top level of the component
     const location = useLocation();
     const navigate = useNavigate();
     const from = location.state?.from?.pathname || "/";
     
-    const handleSignUp = (event) => {
+    const handleSignUp = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
+        setError("");
+        
         const form = event.target;
         const email = form.email.value;
         const password = form.password.value;
 
-        
-
-        createUser(email, password).then((userCredential) => {
-            // Signed up 
+        try {
+            const userCredential = await createUser(email, password);
             const user = userCredential.user;
-            alert("Sign up successfully!");
             navigate(from, { replace: true });
-            // ...
-        }).catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            setError(errorMessage);
-            // ...
-        });
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    // signup using google account
-    const handleRegister = () => {
-        loginWithGoogle().then((result) => {
+    const handleRegister = async () => {
+        setIsLoading(true);
+        setError("");
+        
+        try {
+            const result = await loginWithGoogle();
             const user = result.user;
-            alert("Sign up successfully!");
             navigate(from, { replace: true });
-            //...
-        }).catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            setError(errorMessage);
-            // ...
-        });
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-            <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-                <div
-                    className="absolute inset-0 bg-gradient-to-r from-blue-300 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
-                </div>
-                <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-                    <div className="max-w-md mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-[#FDF8F7] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center"
+                >
+                    <h2 className="text-3xl font-extrabold text-gray-900">Create your account</h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                            Sign in
+                        </Link>
+                    </p>
+                </motion.div>
+            </div>
+
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100"
+                >
+                    <form onSubmit={handleSignUp} className="space-y-6">
                         <div>
-                            <h1 className="text-2xl font-semibold">Sign up Form </h1>
-                        </div>
-                        <div className="divide-y divide-gray-200">
-                            <form onSubmit={handleSignUp} className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                                <div className="relative">
-                                    <input id="email" name="email" type="text" className="peer h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600" placeholder="Email address" />
-
-                                </div>
-                                <div className="relative">
-                                    <input id="password" name="password" type="password" className="peer  h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600" placeholder="Password" />
-
-                                </div>
-                                <p>If you have an account. Please <Link to="/login" className='text-blue-600  underline'> Login </Link> Here</p>
-                                <div className="relative">
-                                    <button className="bg-blue-500 text-white rounded-md px-6 py-2">Sign Up</button>
-                                </div>
-                            </form>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                Email address
+                            </label>
+                            <div className="mt-1 relative">
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="Enter your email"
+                                />
+                                <FaEnvelope className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            </div>
                         </div>
 
-                        <hr />
-                        <div className='flex w-full items-center flex-col mt-5 gap-3'>
-                            <button onClick={handleRegister} className='block'> <img src={googleLogo} alt="" className='w-12 h-12 inline-block' /> login with Google</button>
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Password
+                            </label>
+                            <div className="mt-1 relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                    className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="Create a password"
+                                />
+                                <FaLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            </div>
                         </div>
+
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="rounded-lg bg-red-50 p-4"
+                            >
+                                <p className="text-sm text-red-600">{error}</p>
+                            </motion.div>
+                        )}
+
+                        <motion.button
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? 'Creating account...' : 'Sign up'}
+                        </motion.button>
+                    </form>
+
+                    <div className="mt-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-300" />
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                            </div>
+                        </div>
+
+                        <motion.div className="mt-6">
+                            <motion.button
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.99 }}
+                                onClick={handleRegister}
+                                disabled={isLoading}
+                                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <FaGoogle className="text-red-500" />
+                                Sign up with Google
+                            </motion.button>
+                        </motion.div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     )

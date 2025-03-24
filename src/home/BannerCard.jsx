@@ -20,6 +20,7 @@ const BannerCard = () => {
         grabCursor={true}
         modules={[EffectCards]}
         className="mySwiper"
+        loop={true}
       >
         <SwiperSlide></SwiperSlide>
         <SwiperSlide></SwiperSlide>

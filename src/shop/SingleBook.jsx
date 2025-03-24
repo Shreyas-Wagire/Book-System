@@ -41,11 +41,14 @@ const SingleBook = () => {
             <motion.img
               src={imgUrl}
               alt={bookTitle}
-              className="w-full h-auto object-cover"
+              className="object-cover"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
+              width={300}   // Set fixed width
+              height={400}  // Set fixed height
             />
+
           </div>
           <div className="md:w-2/3 p-8">
             <motion.h2
