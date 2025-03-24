@@ -5,8 +5,14 @@
       "destination": "/index.html"
     }
   ],
+<<<<<<< HEAD
   "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install"
+=======
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+>>>>>>> 8661a617ee73d53395687c732cc44e396754b209
 } 
